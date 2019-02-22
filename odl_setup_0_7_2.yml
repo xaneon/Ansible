@@ -4,13 +4,47 @@
   become: true
   become_user: root
   become_method: sudo  
+  gather_facts: True # if no Python on target machine
+
+  vars:
+    - username: alpine
+    - odl_base_url: "https://nexus.opendaylight.org"
+    - odl_ressource: "content/repositories/opendaylight.release/org/opendaylight/integration/karaf"
+    - odl_version: "0.7.2"
+    - odl_url: "{{ odl_base_url }}/{{ odl_ressource }}/{{ odl_version }}"
+    - odl_tar_file: "{{ odl_url }}/karaf-{{ odl_version}}.tar.gz"
+    - odl_install_dir: "/usr/local/odl"
 
   tasks:
+  # Install openjdk8 via apk
   - apk:
      name: "{{ item }}"
      update_cache: yes
     with_items:
-       - tmux
-       - mc
-       - htop
+       - git 
+       - gcc 
+       - tar
+       - openjdk8  # necessary for ODL
+       - build-base
+
+  - name: Downloading ODL sources
+    get_url:
+      url: "{{ odl_tar_file }}"
+      dest: "/tmp/karaf-{{ odl_version }}.tar.gz"
+    register: odl_source
+
+  - name: Unpacking ODL
+    unarchive:
+      remote_src: yes
+      src: "{{ odl_source.dest }}"
+      dest: "{{ odl_install_dir }}"
+    register: odl_source_unpack 
+
+  - name: Ensure directory exists
+    file: 
+      path: "{{ odl_install_dir }}"
+      state: directory
+      recurse: yes
+      mode: "0777"
+      owner: "{{ username }}"
 
