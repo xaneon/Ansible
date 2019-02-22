@@ -4,7 +4,7 @@
   become: true
   become_user: root
   become_method: sudo  
-  gather_facts: True # if no Python on target machine
+  gather_facts: False # if no Python on target machine
 
   vars:
     - username: alpine
@@ -32,6 +32,14 @@
       url: "{{ odl_tar_file }}"
       dest: "/tmp/karaf-{{ odl_version }}.tar.gz"
     register: odl_source
+
+  - name: Ensure directory exists
+    file: 
+      path: "{{ odl_install_dir }}"
+      state: directory
+      recurse: yes
+      mode: "0777"
+      owner: "{{ username }}"
 
   - name: Unpacking ODL
     unarchive:
