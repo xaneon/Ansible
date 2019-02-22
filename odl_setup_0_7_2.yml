@@ -26,6 +26,7 @@
        - tar
        - openjdk8  # necessary for ODL
        - build-base
+       - sshpass
 
   - name: Downloading ODL sources
     get_url:
