@@ -1,0 +1,18 @@
+---
+- name: Setting up ODL 2.7.2 on Docker Images via SSH
+  hosts: node1 # see hosts.i:w
+  become: true
+  become_user: root
+  become_method: sudo  
+  gather_facts: False # if no Python on target machine
+
+  vars:
+    - username: alpine
+
+  tasks:
+  - apk:
+     name: "{{ item }}"
+     update_cache: yes
+    with_items:
+       - python3-dev
+       - py-virtualenv
