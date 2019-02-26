@@ -46,8 +46,10 @@
        - openblas-dev
 
   - name: Link locale.h
-    become: yes
-    command: "ln -s /usr/include/locale.h /usr/include/xlocale.h"
+    file:
+      src: "/usr/include/locale.h"
+      dest: "/usr/include/xlocale.h"
+      state: link
 
   - name: Downloading Python3 sources
     get_url:
