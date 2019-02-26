@@ -1,5 +1,5 @@
 ---
-- name: Setting up ODL 2.7.2 on Docker Images via SSH
+- name: Setting up Python Jupyter Dev on Docker Images via SSH
   hosts: node1 # see hosts.i:w
   become: true
   become_user: root
@@ -22,11 +22,14 @@
        - py-virtualenv
        - ca-certificates 
        - gcc 
+       - libstdc++
+       - g++
        - musl-dev
        - make
        - tar
        - jpeg-dev 
        - zlib-dev 
+       - linux-headers
 
   - name: Downloading Python3 sources
     get_url:
