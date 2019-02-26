@@ -72,7 +72,7 @@
     register: python3_configure 
     when: python3_source_unpack is changed
   
-  # The following takes a long time
+  # The following takes a very long time
   - name: Installing Python3
     become: yes
     shell: make && make install
