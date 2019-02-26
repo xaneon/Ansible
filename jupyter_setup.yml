@@ -8,6 +8,10 @@
 
   vars:
     - username: alpine
+    - python3_version: 3.7.2
+    - python3_base: "https://www.python.org/ftp/python/"
+    - python3_url: "{{ python3_base }}/{{ python3_version }}/Python-{{ python3_version }}.tgz"
+    - python3_install_dir: "/tmp/Python-{{ python3_version }}"
 
   tasks:
   - apk:
@@ -16,3 +20,41 @@
     with_items:
        - python3-dev
        - py-virtualenv
+       - ca-certificates 
+       - gcc 
+       - musl-dev
+       - make
+       - tar
+       - jpeg-dev 
+       - zlib-dev 
+
+  - name: Downloading Python3 sources
+    get_url:
+      url: "{{ python3_url }}"
+      dest: "/tmp/Python-{{ python3_version }}.tar.gz"
+    register: python3_source
+  
+  - name: Unpacking Python3
+    unarchive:
+      copy: no
+      src: "{{ python3_source.dest }}"
+      dest: /tmp/
+    register: python3_source_unpack 
+    when: python3_source is changed
+  
+  - name: Configuring Python3 source with custom modules
+    command: "./configure --enable-optimizations"
+    args:
+      chdir: "{{ python3_install_dir }}"
+    register: python3_configure 
+    when: python3_source_unpack is changed
+  
+  # The following takes a long time
+  - name: Installing Python3
+    become: yes
+    shell: make && make install
+    args:
+      chdir: "{{ python3_install_dir }}"
+    when: python3_configure is changed
+
+
