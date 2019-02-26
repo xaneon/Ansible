@@ -20,8 +20,11 @@
     with_items:
        - python3-dev
        - py-virtualenv
+       - py3-virtualenv
        - ca-certificates 
        - gcc 
+       - vim
+       - tmux
        - libstdc++
        - g++
        - musl-dev
@@ -30,6 +33,21 @@
        - jpeg-dev 
        - zlib-dev 
        - linux-headers
+       - libffi-dev 
+       - openssl-dev
+       - build-base 
+       - libzmq 
+       - zeromq-dev
+       - py3-zmq
+       - gfortran 
+       - wget 
+       - freetype-dev 
+       - libpng-dev 
+       - openblas-dev
+
+  - name: Link locale.h
+    become: yes
+    command: "ln -s /usr/include/locale.h /usr/include/xlocale.h"
 
   - name: Downloading Python3 sources
     get_url:
