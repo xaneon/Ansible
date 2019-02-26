@@ -8,10 +8,24 @@
 
   vars:
     - username: alpine
+    - user_home_dir: "/home/{{ username }}/"
     - python3_version: 3.7.2
     - python3_base: "https://www.python.org/ftp/python/"
     - python3_url: "{{ python3_base }}/{{ python3_version }}/Python-{{ python3_version }}.tgz"
+    - python36: "/usr/bin/python3.6"
+    - python37: "/usr/bin/python3.7"
+    - virtualenv_dir: "{{ user_home_dir }}/.virtualenvs"
     - python3_install_dir: "/tmp/Python-{{ python3_version }}"
+    - req_dir: "requirements"
+    - virtualenvs: 
+      - {name: "KIML3.7", interpreter: "{{ python37 }}", 
+         rfile: "{{ req_dir }}/requirements_kiml37.txt"}
+      - {name: "KIML3.6", interpreter: "{{ python36 }}", 
+         rfile: "{{ req_dir }}/requirements_kiml36.txt"}
+      - {name: "Default3.7", interpreter: "{{ python37 }}", 
+         rfile: "{{ req_dir }}/requirements_default37.txt"}
+      - {name: "Default3.6", interpreter: "{{ python36 }}", 
+         rfile: "{{ req_dir }}/requirements_default36.txt"}
 
   tasks:
   - apk:
@@ -21,6 +35,7 @@
        - python3-dev
        - py-virtualenv
        - py3-virtualenv
+       - py3-numpy
        - ca-certificates 
        - gcc 
        - vim
@@ -29,6 +44,7 @@
        - g++
        - musl-dev
        - make
+       - findutils
        - tar
        - jpeg-dev 
        - zlib-dev 
@@ -79,6 +95,43 @@
     args:
       chdir: "{{ python3_install_dir }}"
     when: python3_configure is changed
-  # TODO: pip, virtualenv, requirements, kernels
+
+  - name: Link python3.7
+    file:
+      src: "/usr/local/bin/python3.7"
+      dest: "/usr/bin/python3.7"
+      state: link
+
+  - name: create the virtualenv directory
+    file:
+      path: "{{ virtualenv_dir }}"
+      owner: "{{ username }}"
+      state: directory
+      mode: 0777  # "u=rw,g=wx,o=rwx"
+
+
+  - name: Copy requirements to remote machine
+    copy:
+      src: "{{ item.rfile }}"
+      dest: "{{ user_home_dir }}/requirements/"
+    with_items: "{{ virtualenvs }}"
+    become_user: "{{ username }}"
+  
+  - name: creating new virtualenv envs
+    command: "virtualenv {{ virtualenv_dir}}/{{ item.name  }} -p {{item.interpreter}} creates={{ virtualenv_dir }}/{{ item.name }}"
+    args:
+      chdir: "{{ virtualenv_dir }}/"
+    with_items: "{{ virtualenvs }}"
+    become_user: "{{ username }}"
+  
+  # Installation of pip packages takes a long time as well 
+  - name: installing pip packages
+    pip: 
+      requirements: "{{ user_home_dir }}/{{ item.rfile }}"
+      virtualenv: "{{ virtualenv_dir }}/{{ item.name }}"
+      virtualenv_python: "{{ item.interpreter }}"
+    with_items: "{{ virtualenvs }}"
+    become_user: "{{ username }}"
+
 
 
