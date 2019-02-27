@@ -63,6 +63,9 @@
        - openblas-dev
        - tk-dev
        - tcl-dev
+         
+  - name: Upgrade setuptools
+    command: "pip3 install --upgrade pip setuptools"
 
   - name: Link locale.h
     file:
@@ -136,5 +139,17 @@
     with_items: "{{ virtualenvs }}"
     become_user: "{{ username }}"
 
+  - name: Generate Jupyter server config
+    shell: "./.virtualenvs/Default3.6/bin/jupyter notebook --generate-config -y"
+    become_user: "{{ username }}"
+
+  - name: Jupyter notebook start server
+    shell: "echo './.virtualenvs/Default3.6/bin/jupyter notebook --ip=0.0.0.0 --no-browser --NotebookApp.token=alpine --allow-root --notebook-dir=/home/' > '{{ user_home_dir }}/start_jupyter.sh'"
+
+  - name: Change permissions of start script
+    file:
+      path: "{{ user_home_dir }}/start_jupyter.sh"
+      owner: "{{ username }}"
+      mode: "+x"
 
 
