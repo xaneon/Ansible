@@ -8,12 +8,18 @@
 
   vars:
     - username: alpine
+    - password: alpine
     - user_home_dir: "/home/{{ username }}/"
     - python3_version: 3.7.2
     - python3_base: "https://www.python.org/ftp/python/"
     - python3_url: "{{ python3_base }}/{{ python3_version }}/Python-{{ python3_version }}.tgz"
     - python36: "/usr/bin/python3.6"
     - python37: "/usr/bin/python3.7"
+    - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter notebook "  
+    - jupyter_ip: "0.0.0.0"
+    - jupyter_startscript: "start_jupyter.sh"
+    - jupyter_notebook_dir: "{{ user_home_dir }}"
+    - jupyter_params: "--ip={{ jupyter_ip }} --no-browser --NotebookApp.token={{ password }} --allow-root --notebook-dir={{ jupyter_notebook_dir }}"   
     - virtualenv_dir: "{{ user_home_dir }}/.virtualenvs"
     - python3_install_dir: "/tmp/Python-{{ python3_version }}"
     - req_dir: "requirements"
@@ -140,15 +146,15 @@
     become_user: "{{ username }}"
 
   - name: Generate Jupyter server config
-    shell: "./.virtualenvs/Default3.6/bin/jupyter notebook --generate-config -y"
+    shell: "./{{ default_jupyter }} --generate-config -y"
     become_user: "{{ username }}"
 
   - name: Jupyter notebook start server
-    shell: "echo './.virtualenvs/Default3.6/bin/jupyter notebook --ip=0.0.0.0 --no-browser --NotebookApp.token=alpine --allow-root --notebook-dir=/home/' > '{{ user_home_dir }}/start_jupyter.sh'"
+    shell: "echo './{{ default_jupyter }} {{ jupyter_params }}' > '{{ user_home_dir }}/{{ jupyter_startscript }}'"
 
   - name: Change permissions of start script
     file:
-      path: "{{ user_home_dir }}/start_jupyter.sh"
+      path: "{{ user_home_dir }}/{{ jupyter_startscript }}"
       owner: "{{ username }}"
       mode: "+x"
 
