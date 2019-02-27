@@ -17,9 +17,13 @@
     - python37: "/usr/bin/python3.7"
     - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter notebook "  
     - jupyter_ip: "0.0.0.0"
+    - jupyter_port: "9999"
     - jupyter_startscript: "start_jupyter.sh"
     - jupyter_notebook_dir: "{{ user_home_dir }}"
-    - jupyter_params: "--ip={{ jupyter_ip }} --no-browser --NotebookApp.token={{ password }} --allow-root --notebook-dir={{ jupyter_notebook_dir }}"   
+    - jupyter_params: >
+                      "--ip={{ jupyter_ip }} --no-browser --NotebookApp.token={{ password }} "
+                      "--allow-root --notebook-dir={{ jupyter_notebook_dir }} "
+                      "--port={{ jupyter_port }}"
     - virtualenv_dir: "{{ user_home_dir }}/.virtualenvs"
     - python3_install_dir: "/tmp/Python-{{ python3_version }}"
     - req_dir: "requirements"
@@ -150,7 +154,9 @@
     become_user: "{{ username }}"
 
   - name: Jupyter notebook start server
-    shell: "echo './{{ default_jupyter }} {{ jupyter_params }}' > '{{ user_home_dir }}/{{ jupyter_startscript }}'"
+    shell: > 
+           "echo ./{{ default_jupyter }} {{ jupyter_params }}"
+           "> {{ user_home_dir }}/{{ jupyter_startscript }}"
 
   - name: Change permissions of start script
     file:
