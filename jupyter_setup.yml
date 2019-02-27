@@ -33,6 +33,7 @@
      update_cache: yes
     with_items:
        - python3-dev
+       - python3-tkinter
        - py-virtualenv
        - py3-virtualenv
        - py3-numpy
