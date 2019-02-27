@@ -61,6 +61,8 @@
        - freetype-dev 
        - libpng-dev 
        - openblas-dev
+       - tk-dev
+       - tcl-dev
 
   - name: Link locale.h
     file:
