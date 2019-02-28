@@ -1,0 +1,165 @@
+---
+- name: Setting up Python Jupyter Dev on Docker Images via SSH
+  hosts: node1 # see hosts.i:w
+  become: true
+  become_user: root
+  become_method: sudo  
+  gather_facts: False # if no Python on target machine
+
+  vars:
+    - username: alpine
+    - password: alpine
+    - user_home_dir: "/home/{{ username }}/"
+    - python3_version: 3.7.2
+    - python3_base: "https://www.python.org/ftp/python/"
+    - python3_url: "{{ python3_base }}/{{ python3_version }}/Python-{{ python3_version }}.tgz"
+    - python36: "/usr/bin/python3.6"
+    - python37: "/usr/bin/python3.7"
+    - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter notebook "  
+    - jupyter_ip: "0.0.0.0"
+    - jupyter_port: "9999"
+    - jupyter_startscript: "start_jupyter.sh"
+    - jupyter_notebook_dir: "{{ user_home_dir }}"
+    - jupyter_params: "--ip={{ jupyter_ip }} --no-browser --NotebookApp.token={{ password }} 
+                       --allow-root --notebook-dir={{ jupyter_notebook_dir }} 
+                       --port={{ jupyter_port }}"
+    - virtualenv_dir: "{{ user_home_dir }}/.virtualenvs"
+    - python3_install_dir: "/tmp/Python-{{ python3_version }}"
+    - req_dir: "requirements"
+    - virtualenvs: 
+      - {name: "KIML3.7", interpreter: "{{ python37 }}", 
+         rfile: "{{ req_dir }}/requirements_kiml37.txt"}
+      - {name: "KIML3.6", interpreter: "{{ python36 }}", 
+         rfile: "{{ req_dir }}/requirements_kiml36.txt"}
+      - {name: "Default3.7", interpreter: "{{ python37 }}", 
+         rfile: "{{ req_dir }}/requirements_default37.txt"}
+      - {name: "Default3.6", interpreter: "{{ python36 }}", 
+         rfile: "{{ req_dir }}/requirements_default36.txt"}
+
+  tasks:
+  - apk:
+     name: "{{ item }}"
+     update_cache: yes
+    with_items:
+       - python3-dev
+       - python3-tkinter
+       - py-virtualenv
+       - py3-virtualenv
+       - py3-numpy
+       - ca-certificates 
+       - gcc 
+       - vim
+       - tmux
+       - libstdc++
+       - g++
+       - musl-dev
+       - make
+       - findutils
+       - tar
+       - jpeg-dev 
+       - zlib-dev 
+       - linux-headers
+       - libffi-dev 
+       - openssl-dev
+       - build-base 
+       - libzmq 
+       - zeromq-dev
+       - py3-zmq
+       - gfortran 
+       - wget 
+       - freetype-dev 
+       - libpng-dev 
+       - openblas-dev
+       - tk-dev
+       - tcl-dev
+         
+  - name: Upgrade setuptools
+    command: "pip3 install --upgrade pip setuptools"
+
+  - name: Link locale.h
+    file:
+      src: "/usr/include/locale.h"
+      dest: "/usr/include/xlocale.h"
+      state: link
+
+  - name: Downloading Python3 sources
+    get_url:
+      url: "{{ python3_url }}"
+      dest: "/tmp/Python-{{ python3_version }}.tar.gz"
+    register: python3_source
+  
+  - name: Unpacking Python3
+    unarchive:
+      copy: no
+      src: "{{ python3_source.dest }}"
+      dest: /tmp/
+    register: python3_source_unpack 
+    when: python3_source is changed
+  
+  - name: Configuring Python3 source with custom modules
+    command: "./configure --enable-optimizations"
+    args:
+      chdir: "{{ python3_install_dir }}"
+    register: python3_configure 
+    when: python3_source_unpack is changed
+  
+  # The following takes a very long time
+  - name: Installing Python3
+    become: yes
+    shell: make && make install
+    args:
+      chdir: "{{ python3_install_dir }}"
+    when: python3_configure is changed
+
+  - name: Link python3.7
+    file:
+      src: "/usr/local/bin/python3.7"
+      dest: "/usr/bin/python3.7"
+      state: link
+
+  - name: create the virtualenv directory
+    file:
+      path: "{{ virtualenv_dir }}"
+      owner: "{{ username }}"
+      state: directory
+      mode: 0777  # "u=rw,g=wx,o=rwx"
+
+
+  - name: Copy requirements to remote machine
+    copy:
+      src: "{{ item.rfile }}"
+      dest: "{{ user_home_dir }}/requirements/"
+    with_items: "{{ virtualenvs }}"
+    become_user: "{{ username }}"
+  
+  - name: creating new virtualenv envs
+    command: "virtualenv {{ virtualenv_dir}}/{{ item.name  }} -p {{item.interpreter}} creates={{ virtualenv_dir }}/{{ item.name }}"
+    args:
+      chdir: "{{ virtualenv_dir }}/"
+    with_items: "{{ virtualenvs }}"
+    become_user: "{{ username }}"
+  
+  # Installation of pip packages takes a long time as well 
+  - name: installing pip packages
+    pip: 
+      requirements: "{{ user_home_dir }}/{{ item.rfile }}"
+      virtualenv: "{{ virtualenv_dir }}/{{ item.name }}"
+      virtualenv_python: "{{ item.interpreter }}"
+    with_items: "{{ virtualenvs }}"
+    become_user: "{{ username }}"
+
+  - name: Generate Jupyter server config
+    shell: "./{{ default_jupyter }} --generate-config -y"
+    become_user: "{{ username }}"
+
+  - name: Jupyter notebook start server
+    shell: "echo ./{{ default_jupyter }} {{ jupyter_params }} > 
+             {{ user_home_dir }}/{{ jupyter_startscript }}"
+
+  - name: Change permissions of start script
+    file:
+      path: "{{ user_home_dir }}/{{ jupyter_startscript }}"
+      owner: "{{ username }}"
+      mode: "+x"
+
+
