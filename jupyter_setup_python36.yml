@@ -66,6 +66,9 @@
   - name: Upgrade setuptools
     command: "pip3 install --upgrade pip setuptools"
 
+  - name: Install python modules globally
+    command: "pip3 install -r requirements/requirements_default36.txt"
+
   - name: Link locale.h
     file:
       src: "/usr/include/locale.h"
