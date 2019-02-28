@@ -1,10 +1,11 @@
 numpy
-pandas
 scipy
 matplotlib
 ipython
 scikit-learn
 ipykernel
 jupyter
+jupyterlab
+pandas
 
 

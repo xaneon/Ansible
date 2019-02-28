@@ -12,9 +12,11 @@
     - user_home_dir: "/home/{{ username }}/"
     - python36: "/usr/bin/python3.6"
     - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter notebook "  
+    - default_jupyterlab: ".virtualenvs/Default3.6/bin/jupyter-lab"  
     - jupyter_ip: "0.0.0.0"
     - jupyter_port: "9999"
     - jupyter_startscript: "start_jupyter.sh"
+    - jupyterlab_startscript: "start_jupyterlab.sh"
     - jupyter_notebook_dir: "{{ user_home_dir }}"
     - jupyter_params: "--ip={{ jupyter_ip }} --no-browser --NotebookApp.token={{ password }} 
                        --allow-root --notebook-dir={{ jupyter_notebook_dir }} 
@@ -22,8 +24,6 @@
     - virtualenv_dir: "{{ user_home_dir }}/.virtualenvs"
     - req_dir: "requirements"
     - virtualenvs: 
-      - {name: "KIML3.6", interpreter: "{{ python36 }}", 
-         rfile: "{{ req_dir }}/requirements_kiml36.txt"}
       - {name: "Default3.6", interpreter: "{{ python36 }}", 
          rfile: "{{ req_dir }}/requirements_default36.txt"}
 
@@ -65,9 +65,6 @@
          
   - name: Upgrade setuptools
     command: "pip3 install --upgrade pip setuptools"
-
-  - name: Install python modules globally
-    command: "pip3 install -r requirements/requirements_default36.txt"
 
   - name: Link locale.h
     file:
@@ -112,6 +109,10 @@
   - name: Jupyter notebook start server
     shell: "echo ./{{ default_jupyter }} {{ jupyter_params }} > 
              {{ user_home_dir }}/{{ jupyter_startscript }}"
+
+  - name: Jupyterlab start server
+    shell: "echo ./{{ default_jupyterlab }} {{ jupyter_params }} > 
+             {{ user_home_dir }}/{{ jupyterlab_startscript }}"
 
   - name: Change permissions of start script
     file:
