@@ -26,6 +26,7 @@
     - virtualenvs: 
       - {name: "Default3.6", interpreter: "{{ python36 }}", 
          rfile: "{{ req_dir }}/requirements_default36.txt"}
+    - et_logo_fname: "et_logo.png"
 
   tasks:
   - apk:
@@ -120,4 +121,18 @@
       owner: "{{ username }}"
       mode: "+x"
 
+  - name: Create Jupyter custom folder
+    file:
+      path: "{{ user_home_dir }}/.jupyter/custom/"
+      owner: "{{ username }}"
+      mode: "+rw"
+      state: directory
+    become_user: "{{ username }}"
+
+  - name: Copy the ET logo to jupyter
+    copy:
+      src: "{{ et_logo_fname }}"
+      dest: "{{ user_home_dir }}/.jupyter/custom/{{ et_logo_fname }}"
+    become_user: "{{ username }}"
+ 
 
