@@ -129,10 +129,51 @@
       state: directory
     become_user: "{{ username }}"
 
+  - name: Create Jupyter custom.css file
+    file:
+      path: "{{ user_home_dir }}/.jupyter/custom/custom.css"
+      owner: "{{ username }}"
+      mode: "+rw"
+      state: touch
+    become_user: "{{ username }}"
+
+
   - name: Copy the ET logo to jupyter
     copy:
       src: "{{ et_logo_fname }}"
       dest: "{{ user_home_dir }}/.jupyter/custom/{{ et_logo_fname }}"
     become_user: "{{ username }}"
+
+  - name: Adding custom.css for new logo in jupyter
+    blockinfile:
+       path: "{{ user_home_dir }}/.jupyter/custom/custom.css"
+       block: |
+         #ipython_notebook img{                                                                                        
+             display:block;
+             background: url(et_logo.png) no-repeat;
+             background-size: contain;
+             width: 33px;
+             height: 33px;
+             padding-left: 33px;
+             -moz-box-sizing: border-box;
+             box-sizing: border-box;
+         }
+ 
+         #header-container {
+             display: flex;
+             justify-content: space-between;
+         }
+ 
+         span#login_widget {
+             flex-grow: 1;
+             order: 4;
+             display: flex;
+             justify-content: flex-end;
+         }
+ 
+         span#save_widget {
+             flex-grow: 40;
+         }
+       insertafter: EOF
  
 
