@@ -26,7 +26,7 @@
     - virtualenvs: 
       - {name: "Default3.6", interpreter: "{{ python36 }}", 
          rfile: "{{ req_dir }}/requirements_default36.txt"}
-    - et_logo_fname: "et_logo.png"
+    - et_logo_fname: "etlogo.png"
 
   tasks:
   - apk:
@@ -148,32 +148,24 @@
     blockinfile:
        path: "{{ user_home_dir }}/.jupyter/custom/custom.css"
        block: |
-         #ipython_notebook img{                                                                                        
-             display:block;
-             background: url(et_logo.png) no-repeat;
+         #ipython_notebook {
+             height: 40px !important;
+         }
+         #ipython_notebook img{                                                                                display:block;
+             background: url({{ et_logo_fname }}) no-repeat;
              background-size: contain;
-             width: 33px;
+             width: 233px;
              height: 33px;
-             padding-left: 33px;
+             padding-left: 233px;
              -moz-box-sizing: border-box;
              box-sizing: border-box;
          }
- 
-         #header-container {
-             display: flex;
-             justify-content: space-between;
-         }
- 
-         span#login_widget {
-             flex-grow: 1;
-             order: 4;
-             display: flex;
-             justify-content: flex-end;
-         }
- 
-         span#save_widget {
-             flex-grow: 40;
-         }
        insertafter: EOF
- 
+  - name: Link local custom folder to root custom folder
+    file:
+      src: "{{ user_home_dir }}/.jupyter/custom"
+      dest: "/root/.jupyter/custom"
+      state: link
+      force: yes
+
 
