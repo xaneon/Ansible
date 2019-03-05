@@ -11,7 +11,8 @@
     - password: alpine
     - user_home_dir: "/home/{{ username }}/"
     - python36: "/usr/bin/python3.6"
-    - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter notebook "  
+    - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter "  
+    - default_jupyternb: "{{ default_jupyter }} notebook "  
     - default_jupyterlab: ".virtualenvs/Default3.6/bin/jupyter-lab"  
     - jupyter_ip: "0.0.0.0"
     - jupyter_port: "9999"
@@ -106,11 +107,11 @@
     become_user: "{{ username }}"
 
   - name: Generate Jupyter server config
-    shell: "./{{ default_jupyter }} --generate-config -y"
+    shell: "./{{ default_jupyternb }} --generate-config -y"
     become_user: "{{ username }}"
 
   - name: Jupyter notebook start server
-    shell: "echo ./{{ default_jupyter }} {{ jupyter_params }} > 
+    shell: "echo ./{{ default_jupyternb }} {{ jupyter_params }} > 
              {{ user_home_dir }}/{{ jupyter_startscript }}"
 
   - name: Jupyterlab start server
@@ -169,5 +170,9 @@
       dest: "/root/.jupyter/custom"
       state: link
       force: yes
+
+  - name: Install Jupyter notebook extensions
+    shell: "./{{ default_jupyter }} contrib nbextensions install --user"
+
 
 
