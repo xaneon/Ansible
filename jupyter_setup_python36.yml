@@ -56,8 +56,10 @@
        - libzmq 
        - zeromq-dev
        - py3-zmq
+       - libxml2
        - gfortran 
        - wget 
+       - libxslt-dev
        - freetype-dev 
        - libpng-dev 
        - openblas-dev
