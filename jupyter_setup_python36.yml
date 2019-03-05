@@ -66,6 +66,7 @@
        - openblas-dev
        - tk-dev
        - tcl-dev
+       - git
          
   - name: Upgrade setuptools
     command: "pip3 install --upgrade pip setuptools"
