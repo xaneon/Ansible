@@ -173,6 +173,11 @@
 
   - name: Install Jupyter notebook extensions
     shell: "./{{ default_jupyter }} contrib nbextensions install --user"
+    
+  - name: Install Jupyter notebook spellchecking
+    shell: "./{{ default_jupyter }} nbextension enable spellchecker/main"
+    
+
 
 
 
