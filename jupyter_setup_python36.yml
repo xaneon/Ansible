@@ -178,7 +178,7 @@
   - name: Install Jupyter notebook spellchecking
     shell: "./{{ default_jupyter }} nbextension enable spellchecker/main"
     
-
+   # TODO: Add the python dictionary script to container and execute it both as user as well as root. 
 
 
 
