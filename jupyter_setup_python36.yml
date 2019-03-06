@@ -192,7 +192,11 @@
   - name: Get jupyter vimbindings from git
     git:
       repo: "https://github.com/lambdalisue/jupyter-vim-binding"
-      dest: "{{ default_jupyter_dir }}/share/jupyter/nbextensions/vim_bindings"
+      dest: "{{ default_jupyter_dir }}/share/jupyter/nbextensions/vim_binding"
       clone: yes
       update: no
+
+  - name: Install Jupyter notebook vimbindings
+    shell: "./{{ default_jupyter }} nbextension enable vim_binding/vim_binding"
+
 
