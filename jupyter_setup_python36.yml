@@ -11,7 +11,8 @@
     - password: alpine
     - user_home_dir: "/home/{{ username }}/"
     - python36: "/usr/bin/python3.6"
-    - default_jupyter: ".virtualenvs/Default3.6/bin/jupyter "  
+    - default_jupyter_dir: ".virtualenvs/Default3.6/"  
+    - default_jupyter: "{{ default_jupyter_dir }}/bin/jupyter "  
     - default_jupyternb: "{{ default_jupyter }} notebook "  
     - default_jupyterlab: ".virtualenvs/Default3.6/bin/jupyter-lab"  
     - python_dictionary_script: "new_dict.py"
@@ -187,4 +188,11 @@
 
   - name: Run dictionary script
     shell: "{{ virtualenv_dir }}/Default3.6/bin/python3.6 {{ dict_script.dest }}"
+
+  - name: Get jupyter vimbindings from git
+    git:
+      repo: "https://github.com/lambdalisue/jupyter-vim-binding"
+      dest: "{{ default_jupyter_dir }}/share/jupyter/nbextensions/vim_bindings"
+      clone: yes
+      update: no
 
