@@ -15,6 +15,7 @@
     - default_jupyter: "{{ default_jupyter_dir }}/bin/jupyter "  
     - default_jupyternb: "{{ default_jupyter }} notebook "  
     - default_jupyterlab: ".virtualenvs/Default3.6/bin/jupyter-lab"  
+    - vimbindings_fname: "vimkeybindings.js"
     - python_dictionary_script: "new_dict.py"
     - jupyter_ip: "0.0.0.0"
     - jupyter_port: "9999"
@@ -143,11 +144,16 @@
       state: touch
     become_user: "{{ username }}"
 
-
   - name: Copy the ET logo to jupyter
     copy:
       src: "{{ et_logo_fname }}"
       dest: "{{ user_home_dir }}/.jupyter/custom/{{ et_logo_fname }}"
+    become_user: "{{ username }}"
+
+  - name: Copy local vimbinding settings to remote machine
+    copy:
+      src: "{{ vimbindings_fname }}"
+      dest: "{{ user_home_dir }}/.jupyter/custom/custom.js"
     become_user: "{{ username }}"
 
   - name: Adding custom.css for new logo in jupyter
