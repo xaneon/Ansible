@@ -69,6 +69,7 @@
        - openblas-dev
        - tk-dev
        - tcl-dev
+       - graphviz
        - git
          
   - name: Upgrade setuptools
