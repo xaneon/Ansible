@@ -22,3 +22,10 @@
   - name: Upgrade setuptools
     command: "pip3 install --upgrade pip setuptools"
 
+  - name: installing pip packages
+    pip: 
+      name: "{{ item }}"
+    with_items: 
+      - numpy
+
+
