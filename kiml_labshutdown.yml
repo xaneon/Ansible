@@ -1,0 +1,23 @@
+---
+- name: Setup room for KIML course
+  hosts: nodes
+  become: true
+  become_user: root
+  become_method: su
+  gather_facts: False # if no Python on target machine
+
+  vars:
+    - username: "user1"
+    - user_home_dir: "/home/{{ username }}/"
+
+  tasks:
+  - user:
+      name: user1
+      comment: User 1
+      group: sudo
+
+  - name: Shutdown
+    command: "init 0"
+    become: true
+    become_method: su
+
