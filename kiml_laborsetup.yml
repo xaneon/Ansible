@@ -6,6 +6,10 @@
   become_method: su
   gather_facts: False # if no Python on target machine
 
+  vars:
+    - username: "user1"
+    - user_home_dir: "/home/{{ username }}/"
+
   tasks:
   - user:
       name: user1
@@ -45,4 +49,10 @@
       - lxml 
       - pydotplus
       - graphviz
+
+  - name: Copy Notebooks to remote machines
+    copy:
+      src: "Notebooks"
+      dest: "{{ user_home_dir }}/Notebooks"
+  
 
