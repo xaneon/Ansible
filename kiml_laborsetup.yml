@@ -53,6 +53,6 @@
   - name: Copy Notebooks to remote machines
     copy:
       src: "Notebooks"
-      dest: "{{ user_home_dir }}/Notebooks"
+      dest: "{{ user_home_dir }}/"
   
 
