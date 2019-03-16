@@ -1,0 +1,24 @@
+---
+- name: Setup room for KIML course
+  hosts: nodes
+  become: true
+  become_user: root
+  become_method: su
+  gather_facts: False # if no Python on target machine
+
+  tasks:
+  - user:
+      name: user1
+      comment: User 1
+      group: sudo
+
+  - apt:
+     name: "{{ item }}"
+     update_cache: yes
+    with_items:
+       - python3-pip
+    become: true
+         
+  - name: Upgrade setuptools
+    command: "pip3 install --upgrade pip setuptools"
+
