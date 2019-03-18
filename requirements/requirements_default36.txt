@@ -16,4 +16,5 @@ https://github.com/better/alpine-tensorflow/releases/download/alpine3.7-tensorfl
 jupyter_contrib_nbextensions 
 pydotplus
 graphviz
+h5py
 

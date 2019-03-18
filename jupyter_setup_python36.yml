@@ -72,6 +72,9 @@
        - graphviz
        - git
          
+  - name: Install HDF5
+    command: "apk add --no-cache --allow-untrusted --repository http://dl-3.alpinelinux.org/alpine/edge/testing hdf5 hdf5-dev"
+
   - name: Upgrade setuptools
     command: "pip3 install --upgrade pip setuptools"
 
