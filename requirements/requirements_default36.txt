@@ -17,4 +17,5 @@ jupyter_contrib_nbextensions
 pydotplus
 graphviz
 h5py
+tables
 
