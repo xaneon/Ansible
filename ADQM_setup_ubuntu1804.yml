@@ -1,0 +1,89 @@
+---
+    - name: "Setup Ubuntu 18.04 for usecases"
+      hosts: node1
+      become: true
+
+      vars: 
+        username: "s1504h4"
+        user_home_dir: "/home/{{ username }}"
+        apt_packages:
+            - htop
+            - mc
+            - vim
+            - git
+            - tmux
+            - python3-pip
+            - python3-dev
+            - python3-tk
+            - python3-jupyter-core
+            - python3.7
+            - python3.7-dev
+            - python3.8
+            - python3.8-dev
+            - virtualenv
+            - virtualenvwrapper
+            - autojump
+            - sqlite
+            - build-essential
+            - gcc
+            - ansible
+            - docker
+            - postgresql
+            - snap
+            - r-base
+            - r-base-core
+            - r-base-dev
+            - graphviz
+
+        pip_packages:
+            - numpy
+            - scipy
+            - matplotlib
+            - pandas
+            - seaborn
+            - lxml
+            - jellyfish
+            - netmiko
+            - dask
+            - dash
+            - bokeh
+            - xlrd
+            - graphviz
+            - ipython
+            - scikit-learn
+            - ipython
+            - jupyter
+
+
+      tasks:
+          - name: Install packages via APT
+            apt: 
+              name: "{{ apt_packages }}"
+              state: present 
+              update_cache: true
+
+          - name: Upgrade setuptools
+            command: "pip3 install --upgrade pip setuptools"
+
+
+          - name: Install Python Packages
+            pip:
+              name: "{{ pip_packages }}"
+
+          - name: Copy requirements to remote machine
+            copy:
+              src: "requirements_rl3.txt"
+              dest: "{{ user_home_dir }}/"
+
+
+
+
+
+
+
+
+          # - apt:
+          # name: "{{ item }}"
+          # update_cache: yes
+          # with_items:
+          # - mc
